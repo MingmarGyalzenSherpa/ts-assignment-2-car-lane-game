@@ -10,7 +10,7 @@ interface ICar {
   direction?: Direction;
   targetX?: number;
   img: CanvasImageSource;
-
+  ammo: number;
   isImgLoaded?: boolean;
 }
 
@@ -26,6 +26,7 @@ export default class Car implements ICar {
   targetX?: number;
   img: CanvasImageSource;
   isImgLoaded?: boolean;
+  ammo: number;
 
   constructor(
     context: CanvasRenderingContext2D,
@@ -46,7 +47,7 @@ export default class Car implements ICar {
     this.context = context;
     this.curLane = curLane;
     this.img = img;
-
+    this.ammo = 20;
     //add event listener for y-axis movement
   }
 

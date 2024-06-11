@@ -105,6 +105,7 @@ export default class GameManager implements IGameManager {
       if (e.code === "CapsLock") {
         if (this.gameState !== GameState.Running) return;
         console.log("shoot");
+        this.players![0].ammo--;
         this.bullets.push(
           new Bullet(
             this.context,
@@ -118,6 +119,7 @@ export default class GameManager implements IGameManager {
       if (e.code === "KeyM") {
         if (this.gameState !== GameState.Running) return;
         console.log("shoot");
+        this.players![1].ammo--;
         this.bullets.push(
           new Bullet(
             this.context,
@@ -460,7 +462,12 @@ export default class GameManager implements IGameManager {
     this.obstacles?.forEach((obstacle) => {
       obstacle.draw();
     });
-    this.drawScore();
+
+    //draw score
+    // this.drawScore();
+
+    //draw ammo
+    this.drawAmmo();
   }
 
   drawScore() {
@@ -469,6 +476,28 @@ export default class GameManager implements IGameManager {
     this.context.font = "bold 18px sans-serif";
     this.context.fillStyle = "green";
     this.context.fillText(scoreText, this.width - 100, this.y + 30);
+    this.context.closePath();
+  }
+
+  drawAmmo() {
+    let player1OffsetX = 10;
+    let player2OffsetX = -100;
+    let playersOffsetY = 20;
+    let player1AmmoText: string = `Ammo: ${this.players![0].ammo}`;
+    let player2AmmoText: string = `Ammo: ${this.players![1].ammo}`;
+    this.context.beginPath();
+    this.context.font = "bold 18px sans-serif";
+    this.context.fillStyle = "yellow";
+    this.context.fillText(
+      player1AmmoText,
+      this.x + player1OffsetX,
+      this.y + playersOffsetY
+    );
+    this.context.fillText(
+      player2AmmoText,
+      this.width + player2OffsetX,
+      this.y + playersOffsetY
+    );
     this.context.closePath();
   }
 
