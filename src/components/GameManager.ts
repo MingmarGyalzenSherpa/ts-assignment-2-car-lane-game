@@ -81,7 +81,7 @@ export default class GameManager implements IGameManager {
     this.obstacles = [];
     this.score = 0;
     this.hasPassedBoundary = false;
-    this.objectHorizontalMargin = 40; //represents the margin left and right of object  inside a lane
+    this.objectHorizontalMargin = 30; //represents the margin left and right of object  inside a lane
     this.objectWidth = this.widthPerLane - this.objectHorizontalMargin * 2;
     this.speed = 10;
     this.acceleration = 0.0001;
@@ -486,9 +486,14 @@ export default class GameManager implements IGameManager {
 
   gameEndStateRender() {
     this.context.beginPath();
-    this.context.font = "bold 30px sans-serif";
+    this.context.font = "bold 20px sans-serif";
     this.context.fillStyle = "red";
-    this.context.fillText("GAME OVER!!", this.width / 4, this.height / 2);
+    this.context.fillText(`GAME OVER!!`, this.width / 3, this.height / 2.5);
+    this.context.fillText(
+      `Player ${this.winner} WON!! Congrats`,
+      this.width / 5,
+      this.height / 2
+    );
     this.context.font = "20px sans-serif";
     this.context.fillText(
       "Press SPACE to play again",
