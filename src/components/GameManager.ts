@@ -12,6 +12,8 @@ import Bullet from "./Bullet";
 import playerCar from "../assets/sprites/player-car.png";
 interface IGameManager {
   player?: Car;
+  players?: Car[];
+  winner?: number;
   bullets: Bullet[];
   ammo: number;
   x: number;
@@ -36,6 +38,8 @@ interface IGameManager {
 
 export default class GameManager implements IGameManager {
   player?: Car;
+  players?: Car[];
+  winner?: number;
   bullets: Bullet[];
   ammo: number;
   width: number;
@@ -62,11 +66,11 @@ export default class GameManager implements IGameManager {
     this.y = 0;
     this.ammo = 20;
     this.bullets = [];
+    this.players = [];
     this.width = canvas.width;
     this.height = canvas.height;
     this.canvas = canvas;
     this.context = canvas.getContext("2d")!;
-
     this.totalLane = 3;
     this.widthPerLane = this.width / this.totalLane;
     this.gameState = GameState.Waiting;
@@ -111,26 +115,62 @@ export default class GameManager implements IGameManager {
           )
         );
       }
+      switch (e.code) {
+        case "KeyA":
+          //if player2 has its target x, it means its moving
+          if (this.players![0].curLane === 1 || this.players![0].targetX) {
+            break;
+          }
+          this.players![0].setDirectionAndTarget(
+            Direction.Left,
+            this.players![0].x - this.widthPerLane
+          );
+          this.players![0].curLane--;
+          break;
+
+        case "KeyD":
+          //if player1 has its target x, it means its moving
+          console.log("cur Lane player 1 " + this.players![0].curLane);
+          if (
+            this.players![0].curLane === this.totalLane ||
+            this.players![0].targetX
+          ) {
+            break;
+          }
+          this.players![0].setDirectionAndTarget(
+            Direction.Right,
+            this.players![0].x + this.widthPerLane
+          );
+          this.players![0].curLane++;
+
+          break;
+      }
       console.log(e.code);
       switch (e.code) {
         case "ArrowLeft":
-          console.log(this.player?.targetX);
-          //if player has its target x, it means its moving
-          if (this.player?.curLane === 1 || this.player?.targetX) break;
+          console.log("cur laane = " + this.players![1].curLane);
+          //if player1 has its target x, it means its moving
+          if (this.players![1].curLane === 1 || this.players![1].targetX) break;
 
-          this.player?.setDirectionAndTarget(
+          this.players![1].setDirectionAndTarget(
             Direction.Left,
-            this.player.x - this.widthPerLane
+            this.players![1].x - this.widthPerLane
           );
+          this.players![1].curLane--;
           break;
         case "ArrowRight":
-          //if player has its target x, it means its moving
-          if (this.player?.curLane === this.totalLane || this.player?.targetX)
+          //if player1 has its target x, it means its moving
+          if (
+            this.players![1].curLane === this.totalLane ||
+            this.players![1].targetX
+          ) {
             break;
-          this.player?.setDirectionAndTarget(
+          }
+          this.players![1].setDirectionAndTarget(
             Direction.Right,
-            this.player.x + this.widthPerLane
+            this.players![1].x + this.widthPerLane
           );
+          this.players![1].curLane++;
           break;
       }
     });
@@ -182,10 +222,15 @@ export default class GameManager implements IGameManager {
 
   //setup player
   setupPlayer = () => {
-    //the horizontal gap the car should maintain on left and right side in a lane
+    //reset players array
+    this.players = [];
 
+    //the horizontal gap the car should maintain on left and right side in a lane
     //initially player should be in 2 lane
     let playerX: number = this.widthPerLane + this.objectHorizontalMargin;
+
+    //initially player1 should be in 1 lane
+    let player1X: number = this.objectHorizontalMargin;
 
     //width and height should be in aspect ratio 1/1.5
     let playerHeight: number = this.objectWidth * 1.5;
@@ -198,16 +243,30 @@ export default class GameManager implements IGameManager {
     image.src = playerCar;
     console.log("Image width ", image.width);
     console.log(this.objectWidth);
-    this.player = new Car(
-      this.context,
-      playerX,
-      playerY,
-      playerDx,
-      this.objectWidth,
-      playerHeight,
-      2,
-      image
-    );
+    // this.player = new Car(
+    //   this.context,
+    //   playerX,
+    //   playerY,
+    //   playerDx,
+    //   this.objectWidth,
+    //   playerHeight,
+    //   2,
+    //   image
+    // );
+    for (let i = 0; i <= 1; i++) {
+      this.players!.push(
+        new Car(
+          this.context,
+          i * this.widthPerLane + this.objectHorizontalMargin,
+          playerY,
+          playerDx,
+          this.objectWidth,
+          playerHeight,
+          i + 1,
+          image
+        )
+      );
+    }
   };
 
   setupObstacles = () => {
@@ -261,7 +320,10 @@ export default class GameManager implements IGameManager {
     });
 
     //update player
-    this.player?.update();
+    // this.player?.update();
+    this.players?.forEach((player) => {
+      player.update();
+    });
 
     //update bullet
     this.bullets.forEach((bullet) => bullet.update());
@@ -278,10 +340,21 @@ export default class GameManager implements IGameManager {
     if (this.gameState !== GameState.Running) return;
     //collision between obstacle and player car
     let collided = false;
-    for (let i = 0; i < this.obstacles?.length; i++) {
-      if (collisionDetection(this.player!, this.obstacles[i])) {
-        collided = true;
-        break;
+    // for (let i = 0; i < this.obstacles?.length; i++) {
+    //   if (collisionDetection(this.player!, this.obstacles[i])) {
+    //     collided = true;
+
+    //     break;
+    //   }
+    // }
+
+    for (let i = 0; i < this.players!.length; i++) {
+      for (let j = 0; j < this.obstacles?.length; j++) {
+        if (collisionDetection(this.players![i], this.obstacles[j])) {
+          collided = true;
+          this.winner = i === 0 ? 2 : 1;
+          break;
+        }
       }
     }
     if (collided) this.gameState = GameState.End;
@@ -360,7 +433,10 @@ export default class GameManager implements IGameManager {
     });
 
     //draw player
-    this.player?.draw();
+    // this.player?.draw();
+    this.players?.forEach((player) => {
+      player.draw();
+    });
 
     //draw bullet
     this.bullets.forEach((bullet) => {
