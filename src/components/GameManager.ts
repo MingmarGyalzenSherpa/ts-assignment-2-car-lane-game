@@ -67,12 +67,23 @@ export default class GameManager implements IGameManager {
 
       switch (e.code) {
         case "ArrowLeft":
-          if (this.player?.curLane === 1) break;
-          this.player?.move(Direction.Left, this.widthPerLane);
+          console.log(this.player?.targetX);
+          //if player has its target x, it means its moving
+          if (this.player?.curLane === 1 || this.player?.targetX) break;
+
+          this.player?.setDirectionAndTarget(
+            Direction.Left,
+            this.player.x - this.widthPerLane
+          );
           break;
         case "ArrowRight":
-          if (this.player?.curLane === this.totalLane) break;
-          this.player?.move(Direction.Right, this.widthPerLane);
+          //if player has its target x, it means its moving
+          if (this.player?.curLane === this.totalLane || this.player?.targetX)
+            break;
+          this.player?.setDirectionAndTarget(
+            Direction.Right,
+            this.player.x + this.widthPerLane
+          );
           break;
       }
     });
@@ -124,12 +135,14 @@ export default class GameManager implements IGameManager {
 
     //player should be 10 pixel above the bottom boundary
     let offsetY = 10;
+    let playerDx = 5;
     let playerY = this.height - playerHeight - offsetY;
     console.log({ gap, playerWidth, playerX, playerHeight });
     this.player = new Car(
       this.context,
       playerX,
       playerY,
+      playerDx,
       playerWidth,
       playerHeight,
       2
@@ -143,10 +156,13 @@ export default class GameManager implements IGameManager {
 
   update = () => {
     if (this.gameState !== GameState.Running) return;
+
     //move tiles
     this.tiles?.forEach((tile) => {
       tile.update();
     });
+
+    this.player?.update();
   };
 
   draw = () => {
