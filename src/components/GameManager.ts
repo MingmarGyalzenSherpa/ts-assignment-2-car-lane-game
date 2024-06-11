@@ -15,7 +15,6 @@ interface IGameManager {
   players?: Car[];
   winner?: number;
   bullets: Bullet[];
-  ammo: number;
   x: number;
   y: number;
   width: number;
@@ -41,7 +40,6 @@ export default class GameManager implements IGameManager {
   players?: Car[];
   winner?: number;
   bullets: Bullet[];
-  ammo: number;
   width: number;
   height: number;
   canvas: HTMLCanvasElement;
@@ -64,7 +62,6 @@ export default class GameManager implements IGameManager {
   constructor(canvas: HTMLCanvasElement) {
     this.x = 0;
     this.y = 0;
-    this.ammo = 20;
     this.bullets = [];
     this.players = [];
     this.width = canvas.width;
@@ -103,7 +100,8 @@ export default class GameManager implements IGameManager {
         }
       }
       if (e.code === "CapsLock") {
-        if (this.gameState !== GameState.Running) return;
+        if (this.gameState !== GameState.Running || !this.players![0].ammo)
+          return;
         console.log("shoot");
         this.players![0].ammo--;
         this.bullets.push(
@@ -117,7 +115,8 @@ export default class GameManager implements IGameManager {
         );
       }
       if (e.code === "KeyM") {
-        if (this.gameState !== GameState.Running) return;
+        if (this.gameState !== GameState.Running || !this.players![1].ammo)
+          return;
         console.log("shoot");
         this.players![1].ammo--;
         this.bullets.push(
