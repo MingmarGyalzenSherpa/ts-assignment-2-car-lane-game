@@ -98,6 +98,20 @@ export default class GameManager implements IGameManager {
           this.gameState = GameState.Running;
         }
       }
+      if (e.code === "CapsLock") {
+        if (this.gameState !== GameState.Running) return;
+        console.log("shoot");
+        this.bullets.push(
+          new Bullet(
+            this.context,
+            this.player!.x + this.player!.width / 2,
+            this.player!.y,
+            2,
+            5
+          )
+        );
+      }
+      console.log(e.code);
       switch (e.code) {
         case "ArrowLeft":
           console.log(this.player?.targetX);
@@ -233,7 +247,6 @@ export default class GameManager implements IGameManager {
   };
 
   start = () => {
-    console.log("hey");
     this.update();
     this.draw();
     this.collisionDetection();
@@ -268,7 +281,6 @@ export default class GameManager implements IGameManager {
     for (let i = 0; i < this.obstacles?.length; i++) {
       if (collisionDetection(this.player!, this.obstacles[i])) {
         collided = true;
-        console.log("oops");
         break;
       }
     }
@@ -277,11 +289,26 @@ export default class GameManager implements IGameManager {
     //bullet collision
     this.bullets.forEach((bullet) => {
       this.obstacles.forEach((obstacle) => {
-        if (obstacle.x < bullet.x && obstacle.x + obstacle.width > bullet.x) {
-          
+        //check if same lane or if obstacle is being reLocated
+        if (
+          !(obstacle.x < bullet.x && obstacle.x + obstacle.width > bullet.x) ||
+          obstacle.y < this.y
+        ) {
+          return;
+        }
+        //check if collided
+        if (bullet.y + bullet.radius <= obstacle.y + obstacle.height) {
+          bullet.y = this.y;
+          obstacle.hpLine--;
+          if (obstacle.hpLine === 0) {
+            obstacle.y = this.height;
+          }
         }
       });
     });
+
+    //filter the bullet
+    this.bullets = this.bullets.filter((bullet) => bullet.y > this.y);
   };
 
   draw = () => {

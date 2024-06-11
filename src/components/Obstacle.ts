@@ -14,6 +14,7 @@ interface IObstacle {
   maxLane: number;
   widthPerLane: number;
   objectHorizontalMargin: number;
+  hpLine: number;
 }
 
 export default class Obstacle implements IObstacle {
@@ -30,6 +31,7 @@ export default class Obstacle implements IObstacle {
   maxLane: number;
   widthPerLane: number;
   objectHorizontalMargin: number;
+  hpLine: number;
   constructor(
     context: CanvasRenderingContext2D,
     x: number,
@@ -53,6 +55,7 @@ export default class Obstacle implements IObstacle {
     this.context = context;
     this.maxSpeed = 15;
     this.minSpeed = 1;
+    this.hpLine = 3;
     this.image = img;
     this.maxLane = totalLane;
     this.widthPerLane = widthPerLane;
