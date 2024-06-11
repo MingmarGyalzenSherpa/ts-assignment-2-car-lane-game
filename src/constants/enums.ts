@@ -4,7 +4,13 @@ export enum CarType {
 }
 
 export enum GameState {
-  waiting = "waiting",
-  running = "running",
-  end = "end",
+  Waiting = "WAITING",
+  Running = "RUNNING",
+  Paused = "PAUSED",
+  End = "END",
+}
+
+export enum Direction {
+  Left = "LEFT",
+  Right = "RIGHT",
 }

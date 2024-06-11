@@ -1,6 +1,6 @@
 export const CanvasDimension = {
-  WIDTH: 500,
-  HEIGHT: 600,
+  WIDTH: 400,
+  HEIGHT: 500,
 };
 
 export const CarDimension = {

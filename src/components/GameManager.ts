@@ -1,4 +1,4 @@
-import { GameState } from "./../constants/enums";
+import { Direction, GameState } from "./../constants/enums";
 import Background from "./BackGround";
 import Car from "./Car";
 import Obstacle from "./Obstacle";
@@ -19,7 +19,7 @@ interface IGameManager {
   tiles?: Tile[];
   totalLane: number;
   speed: number;
-  lengthPerLane: number;
+  widthPerLane: number;
 }
 
 export default class GameManager implements IGameManager {
@@ -36,7 +36,7 @@ export default class GameManager implements IGameManager {
   tiles?: Tile[];
   totalLane: number;
   speed: number;
-  lengthPerLane: number;
+  widthPerLane: number;
 
   constructor(canvas: HTMLCanvasElement) {
     this.x = 0;
@@ -47,8 +47,8 @@ export default class GameManager implements IGameManager {
     this.context = canvas.getContext("2d")!;
     this.score = 0;
     this.totalLane = 3;
-    this.lengthPerLane = this.width / this.totalLane;
-    this.gameState = GameState.running;
+    this.widthPerLane = this.width / this.totalLane;
+    this.gameState = GameState.Waiting;
     this.background = new Background(
       this.context,
       this.x,
@@ -58,13 +58,31 @@ export default class GameManager implements IGameManager {
     );
     this.speed = 1;
     this.setupTiles();
+    this.setupPlayer();
+    //add event listener for play on space press
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && this.gameState === GameState.Waiting) {
+        this.gameState = GameState.Running;
+      }
+
+      switch (e.code) {
+        case "ArrowLeft":
+          if (this.player?.curLane === 1) break;
+          this.player?.move(Direction.Left, this.widthPerLane);
+          break;
+        case "ArrowRight":
+          if (this.player?.curLane === this.totalLane) break;
+          this.player?.move(Direction.Right, this.widthPerLane);
+          break;
+      }
+    });
     requestAnimationFrame(this.start);
   }
 
   setupTiles = () => {
     this.tiles = [];
     //calculate width of each lane
-    let lengthPerLane: number = this.width / this.totalLane;
+    let widthPerLane: number = this.width / this.totalLane;
     let tileVerticalGap: number = 100;
     //set tile height to 10% of total game height
     let tileHeight: number = (10 / 100) * this.height;
@@ -80,7 +98,7 @@ export default class GameManager implements IGameManager {
         this.tiles?.push(
           new Tile(
             this.context,
-            i * lengthPerLane - offsetX,
+            i * widthPerLane - offsetX,
             j * tileVerticalGap,
             tileWidth,
             tileHeight,
@@ -90,9 +108,33 @@ export default class GameManager implements IGameManager {
         );
       }
     }
-    console.log(this.tiles);
   };
 
+  //setup player
+  setupPlayer = () => {
+    //the horizontal gap the car should maintain on left and right side in a lane
+    let gap: number = 30;
+    //width of player should be less than width of lane
+    let playerWidth: number = this.widthPerLane - gap * 2;
+    //initially player should be in 2 lane
+    let playerX: number = this.widthPerLane + gap;
+
+    //width and height should be in aspect ratio 1/1
+    let playerHeight: number = playerWidth;
+
+    //player should be 10 pixel above the bottom boundary
+    let offsetY = 10;
+    let playerY = this.height - playerHeight - offsetY;
+    console.log({ gap, playerWidth, playerX, playerHeight });
+    this.player = new Car(
+      this.context,
+      playerX,
+      playerY,
+      playerWidth,
+      playerHeight,
+      2
+    );
+  };
   start = () => {
     this.draw();
     this.update();
@@ -100,6 +142,7 @@ export default class GameManager implements IGameManager {
   };
 
   update = () => {
+    if (this.gameState !== GameState.Running) return;
     //move tiles
     this.tiles?.forEach((tile) => {
       tile.update();
@@ -113,15 +156,15 @@ export default class GameManager implements IGameManager {
     this.background.draw();
 
     switch (this.gameState) {
-      case GameState.waiting: {
+      case GameState.Waiting: {
         this.waitingStateRender();
         break;
       }
-      case GameState.running: {
+      case GameState.Running: {
         this.runningStateRender();
         break;
       }
-      case GameState.end: {
+      case GameState.End: {
         break;
       }
     }
@@ -129,11 +172,16 @@ export default class GameManager implements IGameManager {
 
   waitingStateRender() {
     this.context.font = "20px sans-serif";
-    this.context.fillStyle = "white";
-    this.context.fillText(
+    this.context.strokeStyle = "white";
+    this.context.strokeText(
       "WELCOME TO CAR LANE GAME",
-      this.width / 5,
+      this.widthPerLane / 2,
       this.height / 2
+    );
+    this.context.strokeText(
+      "Press SPACE to start",
+      this.widthPerLane / 2 + 50,
+      this.height / 2 + 50
     );
   }
 
@@ -142,5 +190,8 @@ export default class GameManager implements IGameManager {
     this.tiles?.forEach((tile) => {
       tile.draw();
     });
+
+    //draw player
+    this.player?.draw();
   }
 }
