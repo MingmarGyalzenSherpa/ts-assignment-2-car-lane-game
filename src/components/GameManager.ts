@@ -1,0 +1,146 @@
+import { GameState } from "./../constants/enums";
+import Background from "./BackGround";
+import Car from "./Car";
+import Obstacle from "./Obstacle";
+import Tile from "./Tile";
+
+interface IGameManager {
+  player?: Car;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D;
+  obstacles?: Obstacle[];
+  score: number;
+  gameState: GameState;
+  background: Background;
+  tiles?: Tile[];
+  totalLane: number;
+  speed: number;
+  lengthPerLane: number;
+}
+
+export default class GameManager implements IGameManager {
+  player?: Car;
+  width: number;
+  height: number;
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D;
+  score: number;
+  gameState: GameState;
+  x: number;
+  y: number;
+  background: Background;
+  tiles?: Tile[];
+  totalLane: number;
+  speed: number;
+  lengthPerLane: number;
+
+  constructor(canvas: HTMLCanvasElement) {
+    this.x = 0;
+    this.y = 0;
+    this.width = canvas.width;
+    this.height = canvas.height;
+    this.canvas = canvas;
+    this.context = canvas.getContext("2d")!;
+    this.score = 0;
+    this.totalLane = 3;
+    this.lengthPerLane = this.width / this.totalLane;
+    this.gameState = GameState.running;
+    this.background = new Background(
+      this.context,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
+    this.speed = 1;
+    this.setupTiles();
+    requestAnimationFrame(this.start);
+  }
+
+  setupTiles = () => {
+    this.tiles = [];
+    //calculate width of each lane
+    let lengthPerLane: number = this.width / this.totalLane;
+    let tileVerticalGap: number = 100;
+    //set tile height to 10% of total game height
+    let tileHeight: number = (10 / 100) * this.height;
+    //set tile width to 3% of total game width;
+    let tileWidth: number = (3 / 100) * this.width;
+
+    //offset the tile x by half its width
+    let offsetX: number = tileWidth / 2;
+    for (let i = 1; i < this.totalLane; i++) {
+      //number of vertical tiles is based on height,if 600 then 6 tiles
+
+      for (let j = 0; j < this.height / 100; j++) {
+        this.tiles?.push(
+          new Tile(
+            this.context,
+            i * lengthPerLane - offsetX,
+            j * tileVerticalGap,
+            tileWidth,
+            tileHeight,
+            this.speed,
+            this.height
+          )
+        );
+      }
+    }
+    console.log(this.tiles);
+  };
+
+  start = () => {
+    this.draw();
+    this.update();
+    requestAnimationFrame(this.start);
+  };
+
+  update = () => {
+    //move tiles
+    this.tiles?.forEach((tile) => {
+      tile.update();
+    });
+  };
+
+  draw = () => {
+    this.context.clearRect(this.x, this.y, this.width, this.height);
+
+    //draw background
+    this.background.draw();
+
+    switch (this.gameState) {
+      case GameState.waiting: {
+        this.waitingStateRender();
+        break;
+      }
+      case GameState.running: {
+        this.runningStateRender();
+        break;
+      }
+      case GameState.end: {
+        break;
+      }
+    }
+  };
+
+  waitingStateRender() {
+    this.context.font = "20px sans-serif";
+    this.context.fillStyle = "white";
+    this.context.fillText(
+      "WELCOME TO CAR LANE GAME",
+      this.width / 5,
+      this.height / 2
+    );
+  }
+
+  runningStateRender() {
+    //draw tiles
+    this.tiles?.forEach((tile) => {
+      tile.draw();
+    });
+  }
+}
