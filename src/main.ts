@@ -8,4 +8,4 @@ const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 canvas.width = CanvasDimension.WIDTH;
 canvas.height = CanvasDimension.HEIGHT;
 
-const gameManager: GameManager = new GameManager(canvas);
+new GameManager(canvas);

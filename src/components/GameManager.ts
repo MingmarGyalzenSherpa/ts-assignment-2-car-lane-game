@@ -239,13 +239,6 @@ export default class GameManager implements IGameManager {
     //reset players array
     this.players = [];
 
-    //the horizontal gap the car should maintain on left and right side in a lane
-    //initially player should be in 2 lane
-    let playerX: number = this.widthPerLane + this.objectHorizontalMargin;
-
-    //initially player1 should be in 1 lane
-    let player1X: number = this.objectHorizontalMargin;
-
     //width and height should be in aspect ratio 1/1.5
     let playerHeight: number = this.objectWidth * 1.5;
 
@@ -257,16 +250,7 @@ export default class GameManager implements IGameManager {
     image.src = playerCar;
     console.log("Image width ", image.width);
     console.log(this.objectWidth);
-    // this.player = new Car(
-    //   this.context,
-    //   playerX,
-    //   playerY,
-    //   playerDx,
-    //   this.objectWidth,
-    //   playerHeight,
-    //   2,
-    //   image
-    // );
+
     for (let i = 0; i <= 1; i++) {
       this.players!.push(
         new Car(
