@@ -1,3 +1,4 @@
+import getRandomInt from "../utils/utils";
 import { Direction, GameState } from "./../constants/enums";
 import Background from "./BackGround";
 import Car from "./Car";
@@ -20,6 +21,8 @@ interface IGameManager {
   totalLane: number;
   speed: number;
   widthPerLane: number;
+  objectHorizontalMargin: number;
+  objectWidth: number;
 }
 
 export default class GameManager implements IGameManager {
@@ -32,15 +35,18 @@ export default class GameManager implements IGameManager {
   gameState: GameState;
   x: number;
   y: number;
+  obstacles?: Obstacle[];
   background: Background;
   tiles?: Tile[];
   totalLane: number;
   speed: number;
   widthPerLane: number;
-
+  objectHorizontalMargin: number;
+  objectWidth: number;
   constructor(canvas: HTMLCanvasElement) {
     this.x = 0;
     this.y = 0;
+    this.obstacles = [];
     this.width = canvas.width;
     this.height = canvas.height;
     this.canvas = canvas;
@@ -56,9 +62,12 @@ export default class GameManager implements IGameManager {
       this.width,
       this.height
     );
+    this.objectHorizontalMargin = 30; //represents the margin left and right of object  inside a lane
+    this.objectWidth = this.widthPerLane - this.objectHorizontalMargin * 2;
     this.speed = 1;
     this.setupTiles();
     this.setupPlayer();
+    this.setupObstacles();
     //add event listener for play on space press
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && this.gameState === GameState.Waiting) {
@@ -124,29 +133,53 @@ export default class GameManager implements IGameManager {
   //setup player
   setupPlayer = () => {
     //the horizontal gap the car should maintain on left and right side in a lane
-    let gap: number = 30;
-    //width of player should be less than width of lane
-    let playerWidth: number = this.widthPerLane - gap * 2;
+
     //initially player should be in 2 lane
-    let playerX: number = this.widthPerLane + gap;
+    let playerX: number = this.widthPerLane + this.objectHorizontalMargin;
 
     //width and height should be in aspect ratio 1/1
-    let playerHeight: number = playerWidth;
+    let playerHeight: number = this.objectWidth;
 
     //player should be 10 pixel above the bottom boundary
     let offsetY = 10;
     let playerDx = 5;
     let playerY = this.height - playerHeight - offsetY;
-    console.log({ gap, playerWidth, playerX, playerHeight });
     this.player = new Car(
       this.context,
       playerX,
       playerY,
       playerDx,
-      playerWidth,
+      this.objectWidth,
       playerHeight,
       2
     );
+  };
+
+  setupObstacles = () => {
+    //obstacles should be equal to total lane
+    let x: number;
+
+    //width and height of obstacle are same
+    let obstacleHeight: number = this.objectWidth;
+    let gap = obstacleHeight;
+    let obstacleMinY: number = -200;
+    let obstacleMaxY: number = 0;
+    for (let i = 0; i < this.totalLane; i++) {
+      x = i * this.widthPerLane + this.objectHorizontalMargin;
+      this.obstacles?.push(
+        new Obstacle(
+          this.context,
+          x,
+          getRandomInt(obstacleMinY, obstacleMaxY),
+          1,
+          this.objectWidth,
+          obstacleHeight
+        )
+      );
+      obstacleMaxY = obstacleMinY - gap;
+      obstacleMinY = 2 * obstacleMinY;
+      console.log({ obstacleMinY, obstacleMaxY });
+    }
   };
   start = () => {
     this.draw();
@@ -162,7 +195,13 @@ export default class GameManager implements IGameManager {
       tile.update();
     });
 
+    //update player
     this.player?.update();
+
+    //update obstacle
+    this.obstacles?.forEach((obstacle) => {
+      obstacle.update();
+    });
   };
 
   draw = () => {
@@ -209,5 +248,10 @@ export default class GameManager implements IGameManager {
 
     //draw player
     this.player?.draw();
+
+    //draw obstacles
+    this.obstacles?.forEach((obstacle) => {
+      obstacle.draw();
+    });
   }
 }
