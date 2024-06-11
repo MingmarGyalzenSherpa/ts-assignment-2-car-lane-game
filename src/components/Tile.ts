@@ -1,21 +1,28 @@
+import { clamp } from "../utils/utils";
+
 interface ITile {
   x: number;
   y: number;
   dy: number;
+  acceleration: number;
   width: number;
   height: number;
   context: CanvasRenderingContext2D;
+  maxSpeed: number;
+  minSpeed: number;
 }
 
 export default class Tile implements ITile {
   x: number;
   y: number;
   dy: number;
+  acceleration: number;
   width: number;
   height: number;
   context: CanvasRenderingContext2D;
   boundaryHeight: number;
-
+  maxSpeed: number;
+  minSpeed: number;
   constructor(
     context: CanvasRenderingContext2D,
     x: number,
@@ -23,6 +30,7 @@ export default class Tile implements ITile {
     width: number,
     height: number,
     dy: number,
+    acceleration: number,
     boundaryHeight: number
   ) {
     this.x = x;
@@ -30,12 +38,20 @@ export default class Tile implements ITile {
     this.width = width;
     this.height = height;
     this.dy = dy;
+    this.maxSpeed = 15;
+    this.minSpeed = 1;
+    this.acceleration = acceleration;
     this.context = context;
     this.boundaryHeight = boundaryHeight;
   }
 
   update() {
     this.y += this.dy;
+    this.dy = clamp(
+      this.dy + this.dy * this.acceleration,
+      this.minSpeed,
+      this.maxSpeed
+    );
     if (this.y > this.boundaryHeight) {
       console.log("high");
       this.y = -this.height;

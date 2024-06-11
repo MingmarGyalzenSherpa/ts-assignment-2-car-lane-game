@@ -1,5 +1,4 @@
 import { Direction } from "./../constants/enums";
-import { CarDimension } from "../constants/constants";
 interface ICar {
   x: number;
   y: number;
@@ -10,6 +9,9 @@ interface ICar {
   curLane: number;
   direction?: Direction;
   targetX?: number;
+  img: CanvasImageSource;
+
+  isImgLoaded?: boolean;
 }
 
 export default class Car implements ICar {
@@ -22,6 +24,9 @@ export default class Car implements ICar {
   curLane: number;
   direction?: Direction;
   targetX?: number;
+  img: CanvasImageSource;
+  isImgLoaded?: boolean;
+
   constructor(
     context: CanvasRenderingContext2D,
     x: number,
@@ -29,7 +34,8 @@ export default class Car implements ICar {
     dx: number,
     width: number,
     height: number,
-    curLane: number
+    curLane: number,
+    img: CanvasImageSource
   ) {
     //initialize properties
     this.x = x;
@@ -39,16 +45,18 @@ export default class Car implements ICar {
     this.height = height;
     this.context = context;
     this.curLane = curLane;
+    this.img = img;
+
     //add event listener for y-axis movement
   }
 
   draw() {
     this.context.beginPath();
-    this.context.fillStyle = "blue";
-    this.context.fillRect(this.x, this.y, this.width, this.height);
+    // this.context.fillStyle = "blue";
+    // this.context.fillRect(this.x, this.y, this.width, this.height);
+    this.context.drawImage(this.img, this.x, this.y, this.width, this.height);
     this.context.closePath();
   }
-
   setDirectionAndTarget(direction: Direction, targetX: number) {
     this.direction = direction;
     this.targetX = targetX;
