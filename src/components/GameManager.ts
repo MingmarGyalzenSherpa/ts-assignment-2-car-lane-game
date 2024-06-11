@@ -108,8 +108,21 @@ export default class GameManager implements IGameManager {
         this.bullets.push(
           new Bullet(
             this.context,
-            this.player!.x + this.player!.width / 2,
-            this.player!.y,
+            this.players![0].x + this.players![0].width / 2,
+            this.players![0].y,
+            2,
+            5
+          )
+        );
+      }
+      if (e.code === "KeyM") {
+        if (this.gameState !== GameState.Running) return;
+        console.log("shoot");
+        this.bullets.push(
+          new Bullet(
+            this.context,
+            this.players![1].x + this.players![1].width / 2,
+            this.players![1].y,
             2,
             5
           )
