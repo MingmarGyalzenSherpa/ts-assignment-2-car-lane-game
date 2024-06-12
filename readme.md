@@ -19,8 +19,7 @@ Car Lane is a multiplayer game where player avoid obstacles coming
 ## Features
 
 - Three lanes on the road.
--     Player's car can switch lanes using arrow keys or A/D keys.
-
+- layer's car can switch lanes using arrow keys or A/D keys.
 - Player's car is static in the y-direction.
 - Other cars move downward to simulate the player's car moving forward.
 - Collision detection between the player's car and other cars.
@@ -31,3 +30,9 @@ Car Lane is a multiplayer game where player avoid obstacles coming
 - Ensuring at least one lane is always free for the player to pass.
 - Increasing game speed over time.
 - Fair generation of obstacles.
+
+## Additional Features
+
+- can shoot bullets
+- multiplayer
+- score for each player
