@@ -94,9 +94,15 @@ export default class GameManager implements IGameManager {
     //add event listener for play on space press
     document.addEventListener("keydown", (e) => {
       console.log(e.code);
-      if (e.code === "Escape" && this.gameState === GameState.Running) {
-        this.gameState = GameState.Paused;
+      if (e.code === "Escape") {
+        if (this.gameState === GameState.Running) {
+          this.gameState = GameState.Paused;
+        }
+        if (this.gameState === GameState.Paused) {
+          this.gameState = GameState.Running;
+        }
       }
+
       if (e.code === "Space") {
         if (this.gameState === GameState.Waiting) {
           this.gameState = GameState.Running;
