@@ -93,6 +93,10 @@ export default class GameManager implements IGameManager {
 
     //add event listener for play on space press
     document.addEventListener("keydown", (e) => {
+      console.log(e.code);
+      if (e.code === "Escape" && this.gameState === GameState.Running) {
+        this.gameState = GameState.Paused;
+      }
       if (e.code === "Space") {
         if (this.gameState === GameState.Waiting) {
           this.gameState = GameState.Running;
@@ -356,7 +360,6 @@ export default class GameManager implements IGameManager {
   collisionDetection = () => {
     if (this.gameState !== GameState.Running) return;
     //collision between obstacle and player car
-    let collided = false;
     // for (let i = 0; i < this.obstacles?.length; i++) {
     //   if (collisionDetection(this.player!, this.obstacles[i])) {
     //     collided = true;
@@ -368,7 +371,6 @@ export default class GameManager implements IGameManager {
     for (let i = 0; i < this.players!.length; i++) {
       for (let j = 0; j < this.obstacles?.length; j++) {
         if (collisionDetection(this.players![i], this.obstacles[j])) {
-          collided = true;
           this.players![i].crashed = true;
           this.winner = i === 0 ? 2 : 1;
           break;
@@ -414,12 +416,30 @@ export default class GameManager implements IGameManager {
         this.runningStateRender();
         break;
       }
+
+      case GameState.Paused: {
+        this.pausedStateRender();
+        break;
+      }
       case GameState.End: {
         this.gameEndStateRender();
         break;
       }
     }
   };
+
+  pausedStateRender() {
+    this.context.clearRect(this.x, this.y, this.width, this.height);
+    this.background.draw();
+    this.context.beginPath();
+    this.context.fillStyle = "white";
+    this.context.fillText(
+      "Pres ESC to continue",
+      this.width / 4,
+      this.height / 2
+    );
+    this.context.closePath();
+  }
 
   waitingStateRender() {
     this.context.clearRect(this.x, this.y, this.width, this.height);
