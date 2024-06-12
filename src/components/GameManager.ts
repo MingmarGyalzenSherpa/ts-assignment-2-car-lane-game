@@ -127,10 +127,9 @@ export default class GameManager implements IGameManager {
         this.bullets.push(
           new Bullet(
             this.context,
-            this.players![0].x + this.players![0].width / 2,
+            this.players![0].x + this.players![0].width * 0.5, //scaling factor = 2.5
             this.players![0].y,
-            2,
-            5
+            2
           )
         );
       }
@@ -185,7 +184,6 @@ export default class GameManager implements IGameManager {
       }
       switch (e.code) {
         case "ArrowLeft":
-          console.log("cur laane = " + this.players![1].curLane);
           //if player1 has its target x, it means its moving
           if (this.players![1].curLane === 1 || this.players![1].targetX) break;
 
@@ -368,14 +366,6 @@ export default class GameManager implements IGameManager {
 
   collisionDetection = () => {
     if (this.gameState !== GameState.Running) return;
-    //collision between obstacle and player car
-    // for (let i = 0; i < this.obstacles?.length; i++) {
-    //   if (collisionDetection(this.player!, this.obstacles[i])) {
-    //     collided = true;
-
-    //     break;
-    //   }
-    // }
 
     for (let i = 0; i < this.players!.length; i++) {
       for (let j = 0; j < this.obstacles?.length; j++) {
@@ -386,7 +376,6 @@ export default class GameManager implements IGameManager {
         }
       }
     }
-    // if (collided) this.gameState = GameState.End;
     if (this.players![0].crashed && this.players![1].crashed)
       this.gameState = GameState.End;
 
@@ -401,8 +390,9 @@ export default class GameManager implements IGameManager {
           return;
         }
         //check if collided
-        if (bullet.y + bullet.radius <= obstacle.y + obstacle.height) {
+        if (bullet.y <= obstacle.y + obstacle.height) {
           bullet.y = this.y;
+          console.log("hit");
           obstacle.hpLine--;
           if (obstacle.hpLine === 0) {
             obstacle.y = this.height;
@@ -486,7 +476,6 @@ export default class GameManager implements IGameManager {
     });
 
     //draw player
-    // this.player?.draw();
     this.players?.forEach((player) => {
       player.draw();
     });

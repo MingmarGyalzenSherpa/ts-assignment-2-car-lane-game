@@ -80,6 +80,7 @@ export default class Obstacle implements IObstacle {
       this.maxSpeed
     );
     if (this.y > CanvasDimension.HEIGHT) {
+      this.hpLine = 3;
       this.x =
         getRandomInt(0, this.maxLane) * this.widthPerLane +
         this.objectHorizontalMargin;
