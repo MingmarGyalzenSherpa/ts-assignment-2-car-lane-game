@@ -61,7 +61,7 @@ export default class GameManager implements IGameManager {
   objectWidth: number;
   hasPassedBoundary: boolean;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, totalLane: number) {
     this.x = 0;
     this.y = 0;
     this.bullets = [];
@@ -70,7 +70,7 @@ export default class GameManager implements IGameManager {
     this.height = canvas.height;
     this.canvas = canvas;
     this.context = canvas.getContext("2d")!;
-    this.totalLane = 3;
+    this.totalLane = totalLane;
     this.widthPerLane = this.width / this.totalLane;
     this.gameState = GameState.Waiting;
     this.background = new Background(
@@ -102,7 +102,11 @@ export default class GameManager implements IGameManager {
         }
       }
       if (e.code === "CapsLock") {
-        if (this.gameState !== GameState.Running || !this.players![0].ammo)
+        if (
+          this.gameState !== GameState.Running ||
+          !this.players![0].ammo ||
+          this.players![0].crashed
+        )
           return;
         console.log("shoot");
         this.players![0].ammo--;
@@ -117,7 +121,11 @@ export default class GameManager implements IGameManager {
         );
       }
       if (e.code === "KeyM") {
-        if (this.gameState !== GameState.Running || !this.players![1].ammo)
+        if (
+          this.gameState !== GameState.Running ||
+          !this.players![1].ammo ||
+          this.players![1].crashed
+        )
           return;
         console.log("shoot");
         this.players![1].ammo--;
