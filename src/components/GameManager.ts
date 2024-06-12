@@ -423,7 +423,7 @@ export default class GameManager implements IGameManager {
     this.context.fillStyle = "white";
     this.context.fillText(
       "WELCOME TO CAR LANE GAME",
-      this.widthPerLane / 2,
+      this.widthPerLane / 3,
       this.height / 2
     );
     this.context.fillText(
