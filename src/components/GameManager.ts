@@ -9,7 +9,9 @@ import Car from "./Car";
 import Obstacle from "./Obstacle";
 import Tile from "./Tile";
 import Bullet from "./Bullet";
-import playerCar from "../assets/sprites/player-car.png";
+import playerCar1 from "../assets/sprites/player-car-1.png";
+import playerCar2 from "../assets/sprites/player-car-2.png";
+
 interface IGameManager {
   player?: Car;
   players?: Car[];
@@ -196,7 +198,8 @@ export default class GameManager implements IGameManager {
     this.score = 0;
     this.objectHorizontalMargin = 30; //represents the margin left and right of object  inside a lane
     this.objectWidth = this.widthPerLane - this.objectHorizontalMargin * 2;
-    this.speed = 10;
+    this.speed = 1;
+    this.acceleration = 0.001;
     this.setupTiles();
     this.setupPlayer();
     this.setupObstacles();
@@ -246,9 +249,11 @@ export default class GameManager implements IGameManager {
     let offsetY = 10;
     let playerDx = 10;
     let playerY = this.height - playerHeight - offsetY;
-    let image = new Image();
-    image.src = playerCar;
-    console.log("Image width ", image.width);
+    let image1 = new Image();
+    let image2 = new Image();
+    image1.src = playerCar1;
+    image2.src = playerCar2;
+    console.log("Image width ", image1.width);
     console.log(this.objectWidth);
 
     for (let i = 0; i <= 1; i++) {
@@ -261,7 +266,7 @@ export default class GameManager implements IGameManager {
           this.objectWidth,
           playerHeight,
           i + 1,
-          image
+          i === 0 ? image1 : image2
         )
       );
     }
