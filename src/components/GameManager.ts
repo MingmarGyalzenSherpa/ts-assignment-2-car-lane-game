@@ -334,7 +334,13 @@ export default class GameManager implements IGameManager {
     //update obstacle
     this.obstacles?.forEach((obstacle) => {
       this.hasPassedBoundary = obstacle.update(this.obstacles);
-      if (this.hasPassedBoundary) this.score++;
+      if (this.hasPassedBoundary) {
+        this.players?.forEach((player) => {
+          if (!player.crashed) {
+            player.score++;
+          }
+        });
+      }
       this.hasPassedBoundary = false;
     });
   };
@@ -355,12 +361,15 @@ export default class GameManager implements IGameManager {
       for (let j = 0; j < this.obstacles?.length; j++) {
         if (collisionDetection(this.players![i], this.obstacles[j])) {
           collided = true;
+          this.players![i].crashed = true;
           this.winner = i === 0 ? 2 : 1;
           break;
         }
       }
     }
-    if (collided) this.gameState = GameState.End;
+    // if (collided) this.gameState = GameState.End;
+    if (this.players![0].crashed && this.players![1].crashed)
+      this.gameState = GameState.End;
 
     //bullet collision
     this.bullets.forEach((bullet) => {
@@ -452,25 +461,29 @@ export default class GameManager implements IGameManager {
     });
 
     //draw score
-    // this.drawScore();
+    this.drawScore();
 
     //draw ammo
     this.drawAmmo();
   }
 
   drawScore() {
-    let scoreText: string = `Score: ${this.score}`;
+    //player 1
+    let player1ScoreText: string = `Score: ${this.players![0].score}`;
+    let player2ScoreText: string = `Score: ${this.players![1].score}`;
+
     this.context.beginPath();
     this.context.font = "bold 18px sans-serif";
     this.context.fillStyle = "green";
-    this.context.fillText(scoreText, this.width - 100, this.y + 30);
+    this.context.fillText(player1ScoreText, this.x + 10, this.y + 20);
+    this.context.fillText(player2ScoreText, this.width - 100, this.y + 20);
     this.context.closePath();
   }
 
   drawAmmo() {
     let player1OffsetX = 10;
     let player2OffsetX = -100;
-    let playersOffsetY = 20;
+    let playersOffsetY = 50;
     let player1AmmoText: string = `Ammo: ${this.players![0].ammo}`;
     let player2AmmoText: string = `Ammo: ${this.players![1].ammo}`;
     this.context.beginPath();

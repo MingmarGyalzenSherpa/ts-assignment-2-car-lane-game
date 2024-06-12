@@ -12,6 +12,8 @@ interface ICar {
   img: CanvasImageSource;
   ammo: number;
   isImgLoaded?: boolean;
+  score: number;
+  crashed: boolean;
 }
 
 export default class Car implements ICar {
@@ -27,6 +29,8 @@ export default class Car implements ICar {
   img: CanvasImageSource;
   isImgLoaded?: boolean;
   ammo: number;
+  score: number;
+  crashed: boolean;
 
   constructor(
     context: CanvasRenderingContext2D,
@@ -48,13 +52,15 @@ export default class Car implements ICar {
     this.curLane = curLane;
     this.img = img;
     this.ammo = 20;
+    this.score = 0;
+    this.crashed = false;
     //add event listener for y-axis movement
   }
 
   draw() {
+    //draw car image
+    if (this.crashed) return;
     this.context.beginPath();
-    // this.context.fillStyle = "blue";
-    // this.context.fillRect(this.x, this.y, this.width, this.height);
     this.context.drawImage(this.img, this.x, this.y, this.width, this.height);
     this.context.closePath();
   }
@@ -64,7 +70,7 @@ export default class Car implements ICar {
   }
 
   update() {
-    if (this.targetX === undefined) return;
+    if (this.targetX === undefined || this.crashed) return;
     const directionVector = this.direction == Direction.Left ? -1 : 1;
     this.x += directionVector * this.dx;
     if (
