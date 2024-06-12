@@ -32,6 +32,5 @@ export function randomObstacleImageGenerator(): HTMLImageElement {
     return image;
   });
   let randIndex = Math.floor(Math.random() * obstacles.length);
-  console.log(randIndex);
   return obstacleImages[randIndex];
 }

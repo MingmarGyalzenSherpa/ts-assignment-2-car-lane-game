@@ -96,10 +96,14 @@ export default class GameManager implements IGameManager {
       console.log(e.code);
       if (e.code === "Escape") {
         if (this.gameState === GameState.Running) {
+          console.log(this.gameState);
           this.gameState = GameState.Paused;
+          return;
         }
+        console.log(this.gameState);
         if (this.gameState === GameState.Paused) {
           this.gameState = GameState.Running;
+          return;
         }
       }
 
@@ -179,7 +183,6 @@ export default class GameManager implements IGameManager {
 
           break;
       }
-      console.log(e.code);
       switch (e.code) {
         case "ArrowLeft":
           console.log("cur laane = " + this.players![1].curLane);
@@ -413,6 +416,8 @@ export default class GameManager implements IGameManager {
   };
 
   draw = () => {
+    console.log("inside switch case");
+    console.log(this.gameState);
     switch (this.gameState) {
       case GameState.Waiting: {
         this.waitingStateRender();
@@ -424,6 +429,7 @@ export default class GameManager implements IGameManager {
       }
 
       case GameState.Paused: {
+        console.log("heere");
         this.pausedStateRender();
         break;
       }
@@ -435,12 +441,13 @@ export default class GameManager implements IGameManager {
   };
 
   pausedStateRender() {
+    console.log("paused");
     this.context.clearRect(this.x, this.y, this.width, this.height);
     this.background.draw();
     this.context.beginPath();
     this.context.fillStyle = "white";
     this.context.fillText(
-      "Pres ESC to continue",
+      "Press ESC to continue",
       this.width / 4,
       this.height / 2
     );
