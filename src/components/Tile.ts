@@ -53,7 +53,6 @@ export default class Tile implements ITile {
       this.maxSpeed
     );
     if (this.y > this.boundaryHeight) {
-      console.log("high");
       this.y = -this.height;
     }
   }

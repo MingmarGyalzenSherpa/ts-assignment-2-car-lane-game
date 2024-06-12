@@ -93,14 +93,11 @@ export default class GameManager implements IGameManager {
 
     //add event listener for play on space press
     document.addEventListener("keydown", (e) => {
-      console.log(e.code);
       if (e.code === "Escape") {
         if (this.gameState === GameState.Running) {
-          console.log(this.gameState);
           this.gameState = GameState.Paused;
           return;
         }
-        console.log(this.gameState);
         if (this.gameState === GameState.Paused) {
           this.gameState = GameState.Running;
           return;
@@ -122,7 +119,6 @@ export default class GameManager implements IGameManager {
           this.players![0].crashed
         )
           return;
-        console.log("shoot");
         this.players![0].ammo--;
         this.bullets.push(
           new Bullet(
@@ -140,15 +136,13 @@ export default class GameManager implements IGameManager {
           this.players![1].crashed
         )
           return;
-        console.log("shoot");
         this.players![1].ammo--;
         this.bullets.push(
           new Bullet(
             this.context,
             this.players![1].x + this.players![1].width / 2,
             this.players![1].y,
-            2,
-            5
+            2
           )
         );
       }
@@ -167,7 +161,6 @@ export default class GameManager implements IGameManager {
 
         case "KeyD":
           //if player1 has its target x, it means its moving
-          console.log("cur Lane player 1 " + this.players![0].curLane);
           if (
             this.players![0].curLane === this.totalLane ||
             this.players![0].targetX
@@ -272,8 +265,6 @@ export default class GameManager implements IGameManager {
     let image2 = new Image();
     image1.src = playerCar1;
     image2.src = playerCar2;
-    console.log("Image width ", image1.width);
-    console.log(this.objectWidth);
 
     for (let i = 0; i <= 1; i++) {
       this.players!.push(
@@ -303,7 +294,6 @@ export default class GameManager implements IGameManager {
     let image;
     for (let i = 0; i < this.totalLane; i++) {
       x = i * this.widthPerLane + this.objectHorizontalMargin;
-      console.log({ x });
       image = randomObstacleImageGenerator();
       this.obstacles?.push(
         new Obstacle(
@@ -320,7 +310,6 @@ export default class GameManager implements IGameManager {
           this.objectHorizontalMargin
         )
       );
-      console.log({ obstacleMinY, obstacleMaxY });
 
       obstacleMaxY = obstacleMinY - obstacleHeight - gap;
       obstacleMinY = obstacleMaxY - obstacleHeight;
@@ -392,7 +381,6 @@ export default class GameManager implements IGameManager {
         //check if collided
         if (bullet.y <= obstacle.y + obstacle.height) {
           bullet.y = this.y;
-          console.log("hit");
           obstacle.hpLine--;
           if (obstacle.hpLine === 0) {
             obstacle.y = this.height;
@@ -406,8 +394,6 @@ export default class GameManager implements IGameManager {
   };
 
   draw = () => {
-    console.log("inside switch case");
-    console.log(this.gameState);
     switch (this.gameState) {
       case GameState.Waiting: {
         this.waitingStateRender();
@@ -419,7 +405,6 @@ export default class GameManager implements IGameManager {
       }
 
       case GameState.Paused: {
-        console.log("heere");
         this.pausedStateRender();
         break;
       }
@@ -431,7 +416,6 @@ export default class GameManager implements IGameManager {
   };
 
   pausedStateRender() {
-    console.log("paused");
     this.context.clearRect(this.x, this.y, this.width, this.height);
     this.background.draw();
     this.context.beginPath();

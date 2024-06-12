@@ -95,10 +95,7 @@ export default class Obstacle implements IObstacle {
       });
       maxY = maxY - this.height - this.height;
       let minY = maxY - range;
-      console.log("maxY = ", maxY - this.height - this.height);
-      console.log("minY = ", minY);
       this.y = getRandomInt(minY, maxY);
-      console.log("same y happening ", this.y);
     }
     return hasPassedBoundary;
   }
