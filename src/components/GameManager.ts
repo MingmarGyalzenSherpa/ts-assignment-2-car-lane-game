@@ -83,8 +83,8 @@ export default class GameManager implements IGameManager {
     this.hasPassedBoundary = false;
     this.objectHorizontalMargin = 30; //represents the margin left and right of object  inside a lane
     this.objectWidth = this.widthPerLane - this.objectHorizontalMargin * 2;
-    this.speed = 10;
-    this.acceleration = 0.0001;
+    this.speed = 1;
+    this.acceleration = 0.001;
     this.setupTiles();
     this.setupPlayer();
     this.setupObstacles();
