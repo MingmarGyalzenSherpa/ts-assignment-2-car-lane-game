@@ -11,6 +11,7 @@ import Tile from "./Tile";
 import Bullet from "./Bullet";
 import playerCar1 from "../assets/sprites/player-car-1.png";
 import playerCar2 from "../assets/sprites/player-car-2.png";
+import Ammo from "./Ammo";
 
 interface IGameManager {
   player?: Car;
@@ -35,6 +36,8 @@ interface IGameManager {
   objectHorizontalMargin: number;
   objectWidth: number;
   hasPassedBoundary: boolean;
+  ammo?: Ammo;
+  ammoInterval?: number;
 }
 
 export default class GameManager implements IGameManager {
@@ -60,6 +63,8 @@ export default class GameManager implements IGameManager {
   objectHorizontalMargin: number;
   objectWidth: number;
   hasPassedBoundary: boolean;
+  ammo?: Ammo;
+  ammoInterval?: number;
 
   constructor(canvas: HTMLCanvasElement, totalLane: number) {
     this.x = 0;
@@ -96,6 +101,7 @@ export default class GameManager implements IGameManager {
       if (e.code === "Escape") {
         if (this.gameState === GameState.Running) {
           this.gameState = GameState.Paused;
+
           return;
         }
         if (this.gameState === GameState.Paused) {
@@ -105,12 +111,22 @@ export default class GameManager implements IGameManager {
       }
 
       if (e.code === "Space") {
-        if (this.gameState === GameState.Waiting) {
-          this.gameState = GameState.Running;
-        } else if (this.gameState === GameState.End) {
+        if (this.gameState === GameState.End) {
           this.playAgainSetup();
-          this.gameState = GameState.Running;
         }
+        this.ammoInterval = setInterval(
+          () =>
+            (this.ammo = new Ammo(
+              this.context,
+              getRandomInt(0, this.totalLane) * this.widthPerLane +
+                this.objectHorizontalMargin,
+              this.y,
+              this.obstacles[0].dy,
+              this.acceleration
+            )),
+          10000
+        );
+        this.gameState = GameState.Running;
       }
       if (e.code === "CapsLock") {
         if (
@@ -331,7 +347,6 @@ export default class GameManager implements IGameManager {
     });
 
     //update player
-    // this.player?.update();
     this.players?.forEach((player) => {
       player.update();
     });
@@ -351,6 +366,10 @@ export default class GameManager implements IGameManager {
       }
       this.hasPassedBoundary = false;
     });
+
+    if (this.ammo) {
+      this.ammo!.update();
+    }
   };
 
   collisionDetection = () => {
@@ -365,8 +384,11 @@ export default class GameManager implements IGameManager {
         }
       }
     }
-    if (this.players![0].crashed && this.players![1].crashed)
+    if (this.players![0].crashed && this.players![1].crashed) {
+      clearInterval(this.ammoInterval);
+      this.ammo = undefined;
       this.gameState = GameState.End;
+    }
 
     //bullet collision
     this.bullets.forEach((bullet) => {
@@ -478,7 +500,12 @@ export default class GameManager implements IGameManager {
     this.drawScore();
 
     //draw ammo
-    this.drawAmmo();
+    if (this.ammo) {
+      this.ammo!.draw();
+    }
+
+    //draw ammo data
+    this.drawAmmoData();
   }
 
   drawScore() {
@@ -494,7 +521,7 @@ export default class GameManager implements IGameManager {
     this.context.closePath();
   }
 
-  drawAmmo() {
+  drawAmmoData() {
     let player1OffsetX = 10;
     let player2OffsetX = -100;
     let playersOffsetY = 50;
