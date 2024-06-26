@@ -27,4 +27,4 @@ jobs:
         run: npm run build
 
       - name: Deploy to netlify
-        run: netlify deploy --site "${{secrets.CAR_TOKEN}}" --auth "${{secrets.SITE_ID}}" --dir "dist"  --prod
+        run: netlify deploy --site "${{secrets.SITE_ID}}" --auth "${{secrets.CAR_TOKEN}}" --dir "dist"  --prod
